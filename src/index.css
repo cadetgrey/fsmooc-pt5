@@ -16,6 +16,14 @@ code {
     monospace;
 }
 
+.blog {
+  margin: 2px;
+  padding: 10px;
+  border-color: darkslategray;
+  border-style: solid;
+  border-width: 1px;
+}
+
 .notification {
   display: inline-block;
   padding: 5px;

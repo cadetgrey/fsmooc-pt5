@@ -1,7 +1,7 @@
 import React from 'react'
 import Blog from './Blog'
 
-const BlogsView = ({blogs, currentUser, logout}) => (
+const BlogsView = ({blogs, currentUser, logout, handleLike, handleDelete }) => (
   <div>
     <h2>blogs</h2>
 
@@ -9,9 +9,9 @@ const BlogsView = ({blogs, currentUser, logout}) => (
       {currentUser.name} is logged in 
       <button onClick={logout}>logout</button>
     </p>
-
-    {blogs.map(blog =>
-      <Blog key={blog._id} blog={blog} />
+    
+    {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+      <Blog key={blog.id} blog={blog} handleLike={handleLike} handleDelete={handleDelete} currentUser={currentUser} />
     )}
   </div>
 )

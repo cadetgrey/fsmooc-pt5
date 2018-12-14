@@ -22,10 +22,9 @@ class App extends React.Component {
     }
   }
 
-  componentDidMount() {
-    blogService.getAll().then(blogs =>
-      this.setState({ blogs })
-    )
+  async componentDidMount() {
+    const blogsFromDb = await blogService.getAll()
+    this.setState({ blogs: blogsFromDb })
 
     const loggedUserJSON = window.localStorage.getItem('loggedUser')
     if (loggedUserJSON) {
@@ -37,6 +36,34 @@ class App extends React.Component {
 
   handleFieldChange = (event) => {
     this.setState({ [event.target.name]: event.target.value });
+  }
+
+  handleLike = async (likedBlog) => {
+    const updatedBlog = await blogService.update(likedBlog.id, {
+      ...likedBlog,
+      likes: likedBlog.likes + 1
+    })
+    console.log(updatedBlog)
+    const blogs = this.state.blogs.filter(blog => blog.id !== likedBlog.id)
+    this.setState({ blogs: blogs.concat(updatedBlog) });
+  }
+
+  handleDelete = async (blogToDelete) => {
+    const { title, author } = blogToDelete
+    if (window.confirm(`Delete ${title} by ${author}?`)) {
+      try {
+        console.log(blogToDelete)
+        const res =  await blogService.remove(blogToDelete.id)
+        console.log(res)
+        this.setState({
+          blogs: this.state.blogs.filter(blog => blog.id !== blogToDelete.id),
+          actionNotification: `deleted ${title} by ${author}`
+        })
+      } catch (err) {
+        this.setState({ actionNotification: err.error })
+      }
+      this.notificationTimeout()
+    }
   }
 
   login = async (event) => {
@@ -52,11 +79,9 @@ class App extends React.Component {
       blogService.setToken(user.token)
       this.setState({ username: '', password: '', user })
     } catch (err) {
-      // wrap this in a component, copy over from pt2
+      // wrap this in a component, copy over from pt2 ???
       this.setState({ actionNotification: 'incorrect username or password' })
-      setTimeout(() => {
-        this.setState({ actionNotification: null })
-      }, 5000)
+      this.notificationTimeout()
     }
   }
 
@@ -81,11 +106,15 @@ class App extends React.Component {
       this.setState({ title: '', author: '', url: '' });
     } catch (err) {
       console.log(err)
-      this.setState({ actionNotification: err.message })
-      setTimeout(() => {
-        this.setState({ actionNotification: null })
-      }, 5000)
+      this.setState({ actionNotification: err.error })
+      this.notificationTimeout()
     }
+  }
+
+  notificationTimeout = () => {
+    setTimeout(() => {
+      this.setState({ actionNotification: null })
+    }, 5000)
   }
 
   render() {
@@ -105,7 +134,9 @@ class App extends React.Component {
             <BlogsView
               blogs={this.state.blogs}
               currentUser={this.state.user}
-              logout={this.logout} />
+              logout={this.logout}
+              handleLike={this.handleLike}
+              handleDelete={this.handleDelete} />
             <Togglable buttonLabel={'add a blog'} ref={component => this.blogForm = component}>
               <BlogForm
                 blogInfo={blogFormInfo}
