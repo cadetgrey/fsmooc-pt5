@@ -20,9 +20,17 @@ const asObject = (anecdote) => {
 const initialState = anecdotesAtStart.map(asObject)
 
 const reducer = (state = initialState, action) => {
-  console.log('state now: ',state)
+  console.log('state now: ', state)
   console.log('action', action)
-  
+  if (action.type === 'ADD_ANECDOTE') {
+    return [...state, asObject(action.data.anecdote)]
+  }
+  if (action.type === 'INCREMENT_VOTES') {
+    const id = action.data.id
+    const anecdote = state.find(a => a.id === id)
+    const anecdoteWithIncrementedVoteCount = { ...anecdote, votes: anecdote.votes + 1 }
+    return state.map(anecdote => anecdote.id !== id ? anecdote : anecdoteWithIncrementedVoteCount)
+  }
   return state
 }
 
