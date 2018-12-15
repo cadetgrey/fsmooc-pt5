@@ -29,8 +29,8 @@ class Blog extends React.Component {
     // destructuring assignment for clarity?
     return (
       <div onClick={this.toggleExpansion} className='blog'>
-        <div>{title} {author}</div>
-        <div style={showWhenExpanded}>
+        <div className='basicInfo'>{title} {author}</div>
+        <div style={showWhenExpanded} className='details' >
           <a href={url}>{url}</a>
           {likes} likes <button onClick={() => handleLike(blog)}>like</button>
           {name ? `added by ${name}` : name}

@@ -2,7 +2,7 @@ import React from 'react'
 import Blog from './Blog'
 
 const BlogsView = ({blogs, currentUser, logout, handleLike, handleDelete }) => (
-  <div>
+  <div className='blogs-view'>
     <h2>blogs</h2>
 
     <p>
